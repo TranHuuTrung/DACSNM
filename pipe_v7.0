@@ -1,0 +1,220 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#define SIZE 10000
+#define MAX 200
+
+//STACK
+typedef struct Stack {
+	float data[MAX];
+	int top;
+} Stack;
+
+void init(Stack *S){
+    S->top = -1;
+}
+int isEmpty(Stack *S){
+	if (S->top == -1)
+		return 1;
+	return 0;
+}
+void Push(struct Stack* S, float item){
+	if (S->top == (MAX - 1)){
+		printf("\nStack is full");
+	}else{
+		++S->top;
+		S->data[S->top] = item;
+	}
+}
+int top(Stack *S){
+	return (S->data[S->top]);
+}
+float Pop(struct Stack* S){
+	float ret = -1;
+	if (S->top == -1)
+		printf("\nStack is empty");
+	else{
+		ret = S->data[S->top];
+		--S->top;
+	}
+	return ret;
+}
+//END STACK
+int checkUuTien(char x)
+{
+	if (x == '(')
+		return 0;
+	if (x == '+' || x == '-')
+		return 1 ;
+	if (x == '*' || x == '/')
+		return 2;
+	return 3;
+}
+int checkToantu(char ch)
+{
+	if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
+		return 1;
+	return 0;
+}
+/*int checkExpress(char infix[]){
+    char x, token;
+    int i = 0;
+    for (i = 0; i < strlen(infix); i++){
+        token = infix[i];
+        if(isalnum(token)){
+          if(infix[i+1] == ' '){
+            for(int j = i+2; j< strlen(infix); j ++){
+
+            }
+          }
+        }
+    }
+    return 1;
+}
+*/
+int InfixtoPostfix(char infix[], char postfix[]){
+	Stack S;
+	char x, token;
+	int i=0, j=0;    //i-index of infix,j-index of postfix
+	init(&S);
+	for (i = 0; infix[i] != '\0'; i++){
+		token = infix[i];
+		//neu la ky tu - so
+		if (isalnum(token)){
+            postfix[j++] = token;
+            if(checkToantu(infix[i+1]) == 1 || infix[i+1] == ' '){
+                postfix[j++] = ' ';
+            }
+		} else if(token == ' '){
+            continue;
+		} else {
+            if (token == '(') {
+                Push(&S, '(');
+            } else {
+                if (token == ')') {
+                    while ((x = Pop(&S)) != '('){
+                        if(postfix[j] == ' ') {
+                            postfix[j++] = x;
+                            postfix[j++] = ' ';
+                        } else {
+                            postfix[j++] = ' ';
+                            postfix[j++] = x;
+                            postfix[j++] = ' ';
+                        }
+                    }
+                } else{
+					if (checkUuTien(token) <= checkUuTien(top(&S)) && !isEmpty(&S)){
+						x = Pop(&S);
+						 if(postfix[j] == ' ') {
+                            postfix[j++] = x;
+                            postfix[j++] = ' ';
+                        } else {
+                            postfix[j] = ' ';
+                            postfix[j++] = x;
+                            postfix[j++] = ' ';
+                        }
+					}
+					Push(&S, token);
+				}
+            }
+		}
+	}
+	while (!isEmpty(&S))
+	{
+		x = Pop(&S);
+		 if(postfix[j] == ' ') {
+            postfix[j++] = x;
+            postfix[j++] = ' ';
+        } else {
+            postfix[j++] = ' ';
+            postfix[j++] = x;
+            postfix[j++] = ' ';
+        }
+	}
+	postfix[j++] = '\0';
+	return 1;
+}
+float changeToNumber(char arr[]) {
+    int so = 0;
+    int i = 0;
+    for(i =0; arr[i] != '\0'; i++) {
+       so = so *10+ arr[i] - 48;
+    }
+    return so;
+}
+
+float Caculate(char postfix[]){
+	Stack S;
+	float sum = 0;
+	char x, token;
+	int i=0;    //i-index of postfix
+	init(&S);
+	while(postfix[i] != '\0') {
+       token = postfix[i];
+       if(isdigit(token)) {
+            char kytu [20];
+            int k=0; //index of kytu
+            int dem = 0;
+            int j = 0;
+            for(j=i; j< strlen(postfix); j++){
+                if(isdigit(postfix[j])){
+                    kytu[k++] = postfix[j];
+                    dem++;
+                } else {
+                    break;
+                }
+            }
+            kytu[k++] = '\0';
+            int m = 0;
+            m = changeToNumber(kytu);
+            Push(&S, m);
+            i = i+dem;
+        } else if (postfix[i] == ' ') {
+            i++;
+            continue;
+        } else if (postfix[i] == '\0'){
+            break;
+        } else {
+            if(checkToantu(postfix[i]) == 1){
+                //lay 2 gia tri tren stck ra
+                float top1 = Pop(&S);
+                float top2 = Pop(&S);
+                float kqua = 0;
+                switch(postfix[i]) {
+                    case '+':
+                        kqua = top2 + top1;
+                        break;
+                    case '-':
+                        kqua = top2 - top1;
+                        break;
+                    case '*':
+                        kqua = top2 * top1;
+                        break;
+                    case '/':
+                        kqua = top2 / top1;
+                        break;
+                    default:
+                        printf("Not valid operator!");
+                        break;
+                }
+                Push(&S, kqua);
+                i++;
+            }
+        }
+    }
+    sum = Pop(&S);
+    return sum;
+}
+int main(){
+	char A[MAX], B[MAX];
+	printf("Input Infix : ");
+	gets(A);
+	printf("Infix: %s\n", A);
+	if(InfixtoPostfix(A, B) == 1){
+        printf("Postfix: %s\n", B);
+	};
+	printf("Result is %3.3f\n", Caculate(B));
+	return 0;
+}
+
