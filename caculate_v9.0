@@ -102,12 +102,19 @@ int refine(char *input, char *output){
     output[0] = '\0';
     int i=0, j=0; //i - index of input, j - index of output
     char token;
-    for(i = 0; i < strlen(input); i++){
+    /*for(i = 0; i < strlen(input); i++){
        if( input[i] == ' '){
             strcpy(&input[i], &input[i+1]);
             i--;
         }
-    }
+    }*/
+    char *temp=(char*)malloc(strlen(input)+1);
+    int k=0;
+    for(int i=0;i<strlen(input);i++)
+        if (input[i]!=32) temp[k++]=input[i];
+    temp[k]=0;
+    strcpy(input,temp);
+    free(temp);
     for(i=0; i< strlen(input); i++){
         token = input[i];
         if(isdigit(token)){
