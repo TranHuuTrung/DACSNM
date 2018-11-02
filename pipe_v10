@@ -294,7 +294,7 @@ float getStackTinh(){
 }
 
 //Tinh toan bieu thuc postfix
-//dang bi loi o tinh 5-5-5
+//dang bi loi o tinh 5-5-5, => da fix, OK
 float CaculatePostfix(char *postfix){
     float sum = 0;
     char token;
